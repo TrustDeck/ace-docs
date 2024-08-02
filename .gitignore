@@ -1,0 +1,5 @@
+.DS_STORE
+TODO
+scripts/gen-docs-helper/gen-snippets/*
+!scripts/gen-docs-helper/gen-snippets/.gitkeep
+site/
