@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "name": "TestStudieX",
+  "superDomainID": 33,
+  "description": "Just a test",
+  "prefix": "TS-",
+  "validFrom": "2022-02-26T19:15:20.885853",
+  "validTo": "2052-02-19T19:15:20.885853"
+}

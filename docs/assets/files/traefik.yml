@@ -1,0 +1,103 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+#keep this false unless you want to debug your service or visually see some informations on the dashboard
+api:
+  insecure: false
+  dashboard: false
+  debug: false
+
+#configure log level
+log:
+  level: ERROR
+  format: json
+
+#creates two entrypoints listen on port 80/http and 443/https.
+#port 80 is only listen to redirect http to https.
+entryPoints:
+  web:
+    address: :80
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 42
+        graceTimeOut: 42
+    proxyProtocol:
+      insecure: true
+    forwardedHeaders:
+      insecure: true
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: :443
+    transport:
+      lifeCycle:
+        requestAcceptGraceTimeout: 42
+        graceTimeOut: 42
+    proxyProtocol:
+      insecure: true
+    forwardedHeaders:
+      insecure: true
+
+serversTransport:
+  insecureSkipVerify: true
+  maxIdleConnsPerHost: 7
+
+
+#section to set certificates
+#note that the path matches the path given in the stack volume section
+tls:
+  options:
+    default:
+      sniStrict: true
+  certificates:
+    - certFile: /etc/traefik/certs/keycloak.intern.crt
+      keyFile: /etc/traefik/certs/keycloak.intern.key
+    - certFile: /etc/traefik/certs/api.intern.crt
+      keyFile: /etc/traefik/certs/api.intern.key
+
+#important to get traefik working on swarm
+providers:
+  file:
+    directory: /etc/traefik
+    watch: true
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    httpClientTimeout: 300
+    swarmModeRefreshSeconds: 30
+    useBindPortIP: false
+    swarmMode: true
+    watch: true
+    exposedByDefault: false
+    network: frontend
+
+#this creates some default very strict content security policies and some default security header filters which are applied on each service
+http:
+  middlewares:
+    security-headers:
+      headers:
+        accessControlMaxAge: 0
+        addVaryHeader: true
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: same-origin
+        permissionsPolicy: geolocation=(), midi=(), camera=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=(), microphone=()
+        customRequestHeaders:
+          X-Powered-By: ""
+          Cache-Control: no-store
+          Pragma: no-cache
+        customResponseHeaders:
+          X-Powered-By: ""
+
+    strict-self-csp:
+      headers:
+        contentSecurityPolicy: default-src 'none'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-ancestors 'self'; form-action 'self'; connect-src 'self'; manifest-src 'self'; media-src 'self'; frame-src 'self'; prefetch-src 'self'

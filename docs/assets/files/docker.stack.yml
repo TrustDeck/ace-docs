@@ -1,0 +1,273 @@
+version: "3.9"
+
+networks:
+  frontend:
+    external: true
+    name: frontend
+  backend:
+    external: true
+    name: backend
+
+volumes:
+  ps_database_data: { }
+
+#Docker can read sensitive data from files
+secrets:
+  pgsql_root_password:
+    file: ./secrets/pgsql_root_password
+  api_service_oidc_client_secret:
+    file: ./secrets/api_service_oidc_client_secret
+  keycloak_admin_password:
+    file: ./secrets/keycloak_admin_password
+
+services:
+
+  traefik:
+    image: traefik:v2.9
+    networks:
+      - frontend
+    #This is the only place where we expose ports
+    ports:
+      #HTTPS
+      - target: 443
+        published: 443
+        mode: host
+      #HTTP
+      - target: 80
+        published: 80
+        mode: host
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./files/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./certs:/etc/traefik/certs:ro
+    deploy:
+      #Explicit placement that might be necessary for you
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        # Global redirection: HTTPS www to HTTPS non-www
+        - traefik.http.routers.www-redirects.entrypoints=websecure
+        - traefik.http.routers.www-redirects.rule=hostregexp(`{host:(www\.).+}`)
+        - traefik.http.routers.www-redirects.tls=true
+        - traefik.http.routers.www-redirects.middlewares=basic-non-www
+        # Middleware to redirect to bare https
+        - traefik.http.middlewares.redirect-to-non-www-https.redirectregex.regex=^https?://(?:www\.)?(.+)
+        - traefik.http.middlewares.redirect-to-non-www-https.redirectregex.replacement=https://$${1}
+        - traefik.http.middlewares.redirect-to-non-www-https.redirectregex.permanent=true
+        # Middleware to limit the access
+        - traefik.http.middlewares.traefik-ratelimit.ratelimit.average=10000
+        - traefik.http.middlewares.traefik-ratelimit.ratelimit.period=1
+        - traefik.http.middlewares.traefik-ratelimit.ratelimit.burst=50
+        # Middleware chain better structuring
+        - traefik.http.middlewares.basic-non-www.chain.middlewares=traefik-ratelimit,redirect-to-non-www-https
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 20s
+      resources:
+        reservations:
+          memory: 256M
+          cpus: "0.01"
+        limits:
+          cpus: "0.6"
+          memory: 2048M
+
+  ace-service:
+    image: ace:latest
+    networks:
+      - frontend
+      - backend
+    #Some small tweaks
+    sysctls:
+      #Reuses tcp connection which makes the service faster
+      net.ipv4.tcp_tw_reuse: 1
+    environment:
+      - TZ=Europe/Berlin
+      - SPRING_DATASOURCE_NAME=ace
+      - SPRING_DATASOURCE_HOST=ace-database
+      - SPRING_DATASOURCE_PORT=5432
+      - SPRING_DATASOURCE_USERNAME=ace-manager
+      - SPRING_DATASOURCE_PASSWORD__FILE=/run/secrets/pgsql_root_password
+      - SPRING_DATASOURCE_MAX_POOLSIZE=20
+      - SPRING_DATASOURCE_CONNECTION_TIMEOUT=3000
+      #Keycloak settings are only available if Keycloak has been configured first. This could result in a restart of the service once.
+      - SPRING_KEYCLOAK_REALM=production
+      - SPRING_KEYCLOAK_AUTH_SERVER_URL=https://keycloak.intern/
+      - SPRING_KEYCLOAK_CLIENT_ID=production-service
+      - SPRING_KEYCLOAK_CLIENT_SECRET__FILE=/run/secrets/api_service_oidc_client_secret
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    secrets:
+      - pgsql_root_password
+      - api_service_oidc_client_secret
+    #Deploy settings are only available in docker swarm
+    deploy:
+      #Labels are used to get traefik working
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=frontend
+        - traefik.http.routers.api-service.entrypoints=websecure
+        - traefik.http.routers.api-service.service=api-service@docker
+        - traefik.http.routers.api-service.rule=Host(`api.intern`) && PathPrefix(`/api/pseudonymization`)
+        - traefik.http.services.api-service.loadbalancer.server.port=8080
+        - traefik.http.routers.api-service.tls=true
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+          #- node.hostname == my.hostname.de
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+      resources:
+        reservations:
+          memory: 512M
+          cpus: "0.01"
+        limits:
+          cpus: "0.6"
+          memory: 2048M
+
+  ace-database:
+    image: postgres:15.3-alpine
+    networks:
+      - backend
+    #Some small tweaks
+    sysctls:
+      kernel.shmmax: 100663296
+    command: postgres -c 'max_connections=25000' -c 'shared_buffers=256MB'
+    environment:
+      - TZ=Europe/Berlin
+      - POSTGRES_USER=ace-manager
+      - POSTGRES_PASSWORD_FILE=/run/secrets/pgsql_root_password
+      - POSTGRES_DB=ace
+    secrets:
+      - pgsql_root_password
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ps_database_data:/var/lib/postgresql/data
+      #Take care about the path
+      - ./db/ace-schema.sql:/docker-entrypoint-initdb.d/ace-schema.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    #Deploy settings are only available in docker swarm
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+      placement:
+        constraints:
+          #This should always be the same server
+          - node.role == manager
+          #- node.hostname == my.hostename.de
+      resources:
+        reservations:
+          memory: 256M
+          cpus: "0.01"
+        limits:
+          cpus: "0.8"
+          memory: 6144M
+
+  ace-keycloak:
+    #You can change this with a custom build later
+    image: quay.io/keycloak/keycloak:22.0
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      #https://www.keycloak.org/server/all-config
+      KC_HOSTNAME_STRICT: "true"
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      KC_TRANSACTION_XA_ENABLED: "true"
+      #Note that is is a single cluster keycloak to simplifie a production start
+      KC_CACHE: local
+      KC_LOG_LEVEL: info
+      TZ: Europe/Berlin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://ace-database/keycloak
+      KC_DB_USERNAME: ace-manager
+      #Password must be writen here in clear text
+      KC_DB_PASSWORD: root
+      #This does not work within in the standard keycloak container
+      #DOCKER_SECRET_KC_DB_PASSWORD__FILE: /run/secrets/pgsql_root_password
+      KC_DB_SCHEMA: public
+      KEYCLOAK_ADMIN: admin
+      #password must be writen here in clear text
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      #This does not work within in the standard keycloak container
+      #DOCKER_SECRET_KEYCLOAK_ADMIN_PASSWORD__FILE: /run/secrets/keycloak_admin_password
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_FEATURES: docker,token-exchange,preview
+      KC_HOSTNAME: keycloak.intern
+      #This is needed to get it working behind a loadbalancer/proxy
+      KC_PROXY: edge
+    #Do not run this service with --optimized because it does not work within docker swarm
+    command: start
+    secrets:
+      - keycloak_admin_password
+      - pgsql_root_password
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=frontend
+        - traefik.http.routers.keycloak.entrypoints=websecure
+        - traefik.http.routers.keycloak.service=keycloak@docker
+        - traefik.http.routers.keycloak.rule=Host(`keycloak.intern`)
+        - traefik.http.services.keycloak.loadbalancer.server.port=8080
+        - traefik.http.routers.keycloak.tls=true
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          #This should always be the same server
+          - node.role == manager
+          #- node.hostname == my.hostename.de
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+      resources:
+        reservations:
+          memory: 256M
+          cpus: "0.01"
+        limits:
+          cpus: "0.8"
+          memory: 6144M

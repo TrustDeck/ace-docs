@@ -1,0 +1,6 @@
+| 400    | BAD_REQUEST                      | Request without any authorization in the header or incorrect request parameter.                           |
+| 401    | UNAUTHORIZED                     | Request with an invalid or expired token.                                                                 |
+| 403    | FORBIDDEN                        | Request with a valid token but without permissions.                                                       |
+| 404    | NOT FOUND                        | If the requested object or interfaces wasn't found.                                                       |
+| 422    | UNPROCESSABLE ENTITY             | The specified object was not processed due to an unexpected error in the requested object.                |
+| 500    | INTERNAL SERVER ERROR            | Something really bad happens within the application that you are not responsible for.                     |

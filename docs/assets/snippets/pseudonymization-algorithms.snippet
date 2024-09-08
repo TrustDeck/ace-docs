@@ -1,0 +1,12 @@
+Currently, the following pseudonymization algorithms are available:
+
+| Algorithm name |                Description                |       Output length       |
+| -------------- | ----------------------------------------- | ------------------------- |
+| Consecutive    | Consecutive numbers, non-cryptographic    | variable                  |
+| MD5            | Cryptographic (but broken) hash function  | 32 characters (128 bit)   |
+| SHA1           | Cryptographic (but broken) hash function  | 40 characters (160 bit)   |
+| SHA2           | Cryptographic hash function               | 128 characters (512 bit)  |
+| SHA3           | Cryptographic hash function               | 128 characters (512 bit)  |
+| BLAKE3         | Cryptographic hash function               | 64 characters (256 bit)   |
+| Random         | Random numbers, non-cryptographic         | variable                  |
+| xxHash         | Hash function, non-cryptographic          | 16 characters (64 bit)    |

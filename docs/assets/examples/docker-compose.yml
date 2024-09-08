@@ -1,0 +1,95 @@
+volumes:
+  ace_database_data: {}
+
+networks:
+  ace:
+    name: ace
+    driver: bridge
+
+services:
+  ace:
+    container_name: ace
+    image: ace:latest
+    networks:
+      - ace
+    depends_on:
+      - ace-keycloak
+      - ace-postgresql
+    sysctls:
+      net.ipv4.tcp_tw_reuse: 1
+    environment:
+      - TZ=Europe/Berlin
+      - SPRING_DATASOURCE_NAME=ace
+      - SPRING_DATASOURCE_HOST=ace-postgresql
+      - SPRING_DATASOURCE_PORT=5432
+      - SPRING_DATASOURCE_USERNAME=ace-manager
+      - SPRING_DATASOURCE_PASSWORD=ps3udoNym1zation!
+      - SPRING_DATASOURCE_MAX_POOLSIZE=20
+      - SPRING_DATASOURCE_CONNECTION_TIMEOUT=3000
+      - SPRING_KEYCLOAK_REALM=development
+      - SPRING_KEYCLOAK_AUTH_SERVER_URL=http://host.docker.internal:8081/
+      - SPRING_KEYCLOAK_CLIENT_ID=ace
+      - SPRING_KEYCLOAK_CLIENT_SECRET=1h6T3Dnx45hrd4pgv7YdcIfP9GRarbpN
+      - SPRING_GROUP_MAPPER_NAME=groups
+      - SPRING_LOG_LEVEL=INFO
+    ports:
+      - "8080:8080"
+
+  ace-keycloak:
+    container_name: ace-keycloak
+    image: quay.io/keycloak/keycloak:25.0
+    depends_on:
+      - ace-postgresql
+    networks:
+      - ace
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 5s
+      timeout: 2s
+      retries: 15
+    environment:
+      #https://www.keycloak.org/server/all-config
+      KC_HTTP_ENABLED: "false"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "false"
+      KC_LOG_LEVEL: ERROR
+      TZ: Europe/Berlin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://ace-postgresql:5432/keycloak?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
+      KC_DB_USERNAME: ace-manager
+      KC_DB_PASSWORD: ps3udoNym1zation!
+      KC_DB_SCHEMA: public
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_FEATURES: docker,token-exchange,preview
+      # Do not use this in production see this : https://www.keycloak.org/server/containers
+    command: start-dev
+    ports:
+      - "8081:8080"
+      - "8443:8443"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+  ace-postgresql:
+    container_name: ace-postgresql
+    image: postgres:16.3-alpine
+    networks:
+      - ace
+    ports:
+      - "5432:5432"
+    environment:
+      - TZ=Europe/Berlin
+      - POSTGRES_USER=ace-manager
+      # This is the superuserpassword
+      - POSTGRES_PASSWORD=ps3udoNym1zation!
+      # Starting default database
+      - POSTGRES_DB=ace
+    volumes:
+      - ./db/ace-schema.sql:/docker-entrypoint-initdb.d/ace-schema.sql
+      - ./db/keycloak-dump.sql:/docker-entrypoint-initdb.d/keycloak-dump.sql
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ace_database_data:/var/lib/postgresql/data

@@ -1,0 +1,90 @@
+# can be empty if wanted
+java_prefix: doc_
+
+# used to check if something between new and old snippets does not match
+# does not check the files only folder names yet
+# will show in the end not matches folders
+# takes the root directory as the entrypoint
+
+ace_snippet_dir: /your-path/ace/target/generated-snippets/
+real_docs_interface_snippts_dir: /docs/assets/snippets/interface/
+
+# define interfaces to transform (not copying) from java target/generated-snipptes into the docs snippet format
+interface:
+  - java: createCommonRecord
+    docs: createRecord
+
+  - java: createNewRecordBatch
+    docs: createRecordBatch
+
+  - java: readRecordBatch
+    docs: readRecordBatch
+
+  - java: readRecordByIdentifier
+    docs: readRecordByIdentifier
+
+  - java: readRecordByPseudonym
+    docs: readRecordByPseudonym
+
+  - java: updateRecordByIdentifier
+    docs: updateRecordByIdentifier
+
+  - java: updateRecordByPseudonym
+    docs: updateRecordByPseudonym
+
+  - java: updateRecordBatch
+    docs: updateRecordBatch
+
+  - java: updateRecordCompleteByIdentifier
+    docs: updateRecordCompleteByIdentifier
+
+  - java: updateRecordCompleteByPseudonym
+    docs: updateRecordCompleteByPseudonym
+
+  - java: deleteRecord
+    docs: deleteRecord
+
+  - java: deleteRecordFromBatch
+    docs: deleteRecordBatch
+
+  - java: createDomainComplete
+    docs: createDomainComplete
+
+  - java: createDomain
+    docs: createDomain
+
+  - java: getDomain
+    docs: readDomain
+
+  - java: commonUpdateDomain
+    docs: updateDomain
+
+  - java: commonUpdateDomainComplete
+    docs: updateDomainComplete
+  
+  - java: deleteDomain
+    docs: deleteDomain
+
+  - java: getSalt
+    docs: readSalt
+
+  - java: updateSalt
+    docs: updateSalt
+
+  - java: listDomainHierarchy
+    docs: listDomainHierarchy
+
+  - java: createScenarioRootDomainComplete
+    docs: createScenarioRootDomainComplete
+
+  - java: createScenarioChildOneDomainComplete
+    docs: createScenarioChildOneDomainComplete
+
+  - java: createScenarioChildTwoDomainComplete
+    docs: createScenarioChildTwoDomainComplete
+
+  - java: createScenarioChildThreeDomainComplete
+    docs: createScenarioChildThreeDomainComplete
+
+  - java: createScenarioChildOfchildTwoDomainComplete
+    docs: createScenarioChildOfchildTwoDomainComplete

@@ -1,0 +1,15 @@
+{
+  "name": "TestStudieX",
+  "prefix": "TS",
+  "validFrom": "2022-02-26T19:15:20.885853",
+  "validTo": "2052-02-19T19:15:20.885853",
+  "enforceStartDateValidity": true,
+  "enforceEndDateValidity": true,
+  "algorithm": "MD5",
+  "consecVal": 1,
+  "pseudonymLength": 32,
+  "paddingCharacter": "0",
+  "description": "",
+  "superDomainName": "TESTXYZ",
+  "salt": "azMPTIQXJsept_4nDj5B1BXN83Bj_8VJ"
+}

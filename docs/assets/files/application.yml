@@ -1,0 +1,77 @@
+server:
+  port: 8080  # Server port
+  # Disable generic error pages
+  error:
+    whitelabel:
+      enabled: false
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+  # This ensures that a larger access token can be sent via a post request.
+  max-http-request-header-size: 6KB
+
+# General log level
+logging:
+  level:
+    root: ERROR
+
+# Enables virtual thread java 21 feature
+spring:
+  threads:
+      virtual:
+          enabled: true
+  jpa:
+    open-in-view: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  main:
+    allow-circular-references: true
+  # Example configuration for oauth2 via oidc
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Custom section starts
+          # Server-uri without /auth since keycloak 17
+          principal-attribute: preferred_username
+          # url must end without /
+          server-uri: http://host.docker.internal:8081
+          truststore: classpath:pki_chain.truststore
+          truststore-password: l129VwykBVwp5FlfdPe7qQ9GOaq2rckC
+          client-id: ace
+          # Client-secret is only used in the tests
+          client-secret: 1h6T3Dnx45hrd4pgv7YdcIfP9GRarbpN
+          realm: development
+          # Custom section ends
+          domain-role-group-claim-name: groups
+          domain-role-group-context-name: Domain
+          jws-algorithm: RSA256
+          issuer-uri: ${spring.security.oauth2.resourceserver.jwt.server-uri}/realms/${spring.security.oauth2.resourceserver.jwt.realm}
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
+# Config for our self-implemented audittrail
+audittrail:
+  oidc-group-mapper:
+    # This must also be configured within keycloak
+    token-claim-name: groups
+    group-names:
+      # These group names are mandatory in keycloak to work
+      isHuman: Human
+      isTechnical: Technical
+      isNoAuditing: Unaudited
+      isAuditEverything: AuditEverything
+
+# Config for the database connection
+app:
+  datasource:
+    ace:
+      # Changes can be made below
+      url: jdbc:postgresql://localhost:5432/ace
+      username: ace-manager
+      password: ps3udoNym1zation!
+      configuration:
+        maximum-pool-size: 20 # Maximum number of DB connections that are managed by the Hikari data source

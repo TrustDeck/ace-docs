@@ -1,0 +1,33 @@
+{
+  "id": "10000008912",
+  "idType": "ANY-ID",
+  "psn": "TS-9EEEE39F0D5C03507CB9388609E925F9",
+  "validFrom": "2023-08-04T09:56:14.887102",
+  "validFromInherited": false,
+  "validTo": "2052-02-19T19:15:20.885853",
+  "validToInherited": true,
+  "domainName": "TestStudie",
+  "domain": {
+    "id": 1,
+    "name": "TestStudie",
+    "prefix": "TS-",
+    "validFrom": "2022-02-26T19:15:20.885853",
+    "validFromInherited": false,
+    "validTo": "2052-02-19T19:15:20.885853",
+    "validToInherited": false,
+    "enforceStartDateValidity": true,
+    "enforceStartDateValidityInherited": false,
+    "enforceEndDateValidity": true,
+    "enforceEndDateValidityInherited": false,
+    "algorithm": "MD5",
+    "algorithmInherited": false,
+    "consecVal": 1,
+    "pseudonymLength": 32,
+    "pseudonymLengthInherited": false,
+    "paddingCharacter": "0",
+    "paddingCharacterInherited": false,
+    "salt": "azMPTIQXJsept_4nDj5B1BXN83Bj_8VJ",
+    "saltLength": 32,
+    "description": ""
+  }
+}

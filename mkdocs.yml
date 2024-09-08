@@ -1,0 +1,158 @@
+site_name: ACE - Advanced Confidentiality Engine v0.50.0-BETA
+docs_dir: docs
+#https://stackoverflow.com/questions/69269618/how-do-you-remove-the-previous-and-next-buttons-in-mkdocs
+extra_css:
+  - extra.css
+
+validation:
+  links:
+    absolute_links: ignore
+    anchors: warn
+    unrecognized_links: warn
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/TrustDeck/ace
+      name: ACE GitHub
+
+theme:
+  sponsor: assets/images/logo/bmbf.svg
+  logo: assets/images/logo/trustdeck.png
+  favicon: assets/images/logo/trustdeck.png
+  name: material
+  custom_dir: overrides
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: ace
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to light mode
+  language: en
+  direction: ltr
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.path
+    - toc.follow
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - offline
+    - content.tabs.link
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Use Cases: use-cases.md
+  #    - use-cases/common-scenarios.md
+  #    - use-cases/kafka-integration.md
+  - Getting Started:
+      - getting-started/prerequisites.md
+      - getting-started/setup.md
+      - getting-started/getting-access.md
+      - getting-started/first-requests.md
+  - Benchmark: benchmark/results.md
+  - Configuration:
+      - Service: configuration/service.md
+      - Roles: configuration/roles.md
+  - Building ACE: building-ace.md
+  #- Building:
+  #    - building/service.md
+  #    - building/docs.md
+  - Guides:
+  #    - guides/production-ready.md
+      - guides/keycloak.md
+      #- guides/python-sdk.md
+  #- Development:
+  #    - development/setup.md
+  #    - Testing:
+  #        - Postman: development/testing/postman.md
+  #        - JUnit: development/testing/junit.md
+  #    - development/authentication.md
+  #    - Audit trail: development/audittrail.md
+  #    - development/documentation.md
+  - Interfaces:
+      - interfaces/response-formats.md
+      - Core Objects:
+          - Domain Object: interfaces/objects/domain-object.md
+          - Record Object: interfaces/objects/record-object.md
+          - HttpStatus Objects and Code: interfaces/objects/httpstatus-object.md
+      - Experimental Endpoints:
+          - List Domain Hierarchy: interfaces/endpoints/batch/domain/listDomainHierarchy.md
+      - Domain Endpoints:
+          - Create Domain: interfaces/endpoints/single/domain/createDomain.md
+          - Create Domain Complete: interfaces/endpoints/single/domain/createDomainComplete.md
+          - Read Domain: interfaces/endpoints/single/domain/getDomain.md
+          - Update Domain: interfaces/endpoints/single/domain/updateDomain.md
+          - Update Domain Complete: interfaces/endpoints/single/domain/updateDomainComplete.md
+          - Delete Domain: interfaces/endpoints/single/domain/deleteDomain.md
+          - Read Domain Salt: interfaces/endpoints/single/domain/getSalt.md
+          - Update Domain Salt: interfaces/endpoints/single/domain/updateSalt.md
+      - Record Endpoints:
+          - Create Record: interfaces/endpoints/single/pseudonym/createRecord.md
+          - Read Record by PSN: interfaces/endpoints/single/pseudonym/getRecordByPseudonym.md
+          - Read Record by ID: interfaces/endpoints/single/pseudonym/getRecordByIdentifier.md
+          - Update Record by PSN: interfaces/endpoints/single/pseudonym/updateRecordByPseudonym.md
+          - Update Record by ID: interfaces/endpoints/single/pseudonym/updateRecordByIdentifier.md
+          - Update Record Complete by PSN: interfaces/endpoints/single/pseudonym/updateRecordCompleteByPseudonym.md
+          - Update Record Complete by ID: interfaces/endpoints/single/pseudonym/updateRecordCompleteByIdentifier.md
+          - Delete Record: interfaces/endpoints/single/pseudonym/deleteRecord.md
+          - List Records: interfaces/endpoints/batch/pseudonym/getRecordBatch.md
+          - Create Records in batch: interfaces/endpoints/batch/pseudonym/createRecordBatch.md
+          - Update Records in batch: interfaces/endpoints/batch/pseudonym/updateRecordBatch.md
+          - Delete Records in batch: interfaces/endpoints/batch/pseudonym/deleteRecordBatch.md
+  - Project THS-MED: https://ths-med.de/
+  - license.md
+markdown_extensions:
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - abbr
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - footnotes
+  - def_list
+  - meta
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      auto_title: true
+      anchor_linenums: true
+      linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  #- git-revision-date-localized
+  - render_swagger
+  - open-in-new-tab
+  - glightbox:
+      skip_classes:
+        - skip-lightbox
+  - search:
+      lang: en
