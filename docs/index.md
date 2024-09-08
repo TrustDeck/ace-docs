@@ -31,7 +31,6 @@ This pseudonymization service was created because we couldn't find a tool which 
 - [x] Stable and lightweight architecture
     - [x] LTS for endpoints
     - [x] Modern REST-API microservice interface which returns a JSON or plain text
-    - [ ] FHIR Interface
 - [x] Permission check on each endpoint for every requester
     - [x] Adjustable output based on roles
 

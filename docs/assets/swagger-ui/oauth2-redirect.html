@@ -68,9 +68,11 @@
     }
 
     if (document.readyState !== 'loading') {
+        console.log("check1");
         run();
     } else {
         document.addEventListener('DOMContentLoaded', function () {
+            console.log("check2");
             run();
         });
     }

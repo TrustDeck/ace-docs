@@ -11,11 +11,11 @@ We try to collect and describe them for everyone in the following sections.
 
 ## Create a mesh of Domains
 
-| Item           | Description                                                                                                                                          |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Used Interface | - [/domain](/interfaces/endpoints/single/domain/createDomain/) <br/> - [/domain/complete](/interfaces/endpoints/single/domain/createDomainComplete/) |
-| What happens?  | Creates a domain from a reduced or complete given object. Uses previously created domains as parent domains in new requests.                         |
-| Returns        | `201 Created` for all successfull requests.                                                                                                          |
+| Item           | Description                                                                                                                  |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Used Interface | - /domain <br/> - /domain/complete                                                                                           |
+| What happens?  | Creates a domain from a reduced or complete given object. Uses previously created domains as parent domains in new requests. |
+| Returns        | `201 Created` for all successfull requests.                                                                                  |
 
 The following graph describes what we want to achieve in this scenario, a _Mesh of domains_:
 
@@ -59,11 +59,11 @@ Why are we doing this? If pseudonyms are created, then always for a specific pur
 
 ## Request records(s)
 
-| Item           | Description                                                                                                                                                                                 |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Used Interface | - [/domains/{domain}/pseudonym](/interfaces/endpoints/single/pseudonym/getRecordByPseudonym/) <br/> - [/domains/{domain}/pseudonyms](/interfaces/endpoints/batch/pseudonym/getRecordBatch/) |
-| What happens?  | Returns the record for the given pseudonym or the list of records in the given domain.                                                                                                      |
-| Returns        | `200 Ok` with [record](/interfaces/objects/record-object/) object for all successfull requests.                                                                                             |
+| Item           | Description                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| Used Interface | -/domains/{domain}/pseudonym <br/> - /domains/{domain}/pseudonyms                               |
+| What happens?  | Returns the record for the given pseudonym or the list of records in the given domain.          |
+| Returns        | `200 Ok` with [record](/interfaces/objects/record-object/) object for all successfull requests. |
 
 It is really common to request records in a single or batch call. There are many different situations where the record is needed, e.g. in plausibility checks or de-pseudonymization.
 
@@ -89,11 +89,11 @@ It is really common to request records in a single or batch call. There are many
 
 ## Partially update/invalidate records
 
-| Item            | Description                                                                                      |
-| --------------- | ------------------------------------------------------------------------------------------------ |
-| Used Interface: | - [/domains/{domain}/pseudonym](/interfaces/endpoints/single/pseudonym/updateRecordByPseudonym/) |
-| What happens?   | Removing the id and idType from the record or setting the validTo date to now.                   |
-| Returns         | `200 Ok` with [record](/interfaces/objects/record-object/) object                                |
+| Item            | Description                                                                    |
+| --------------- | ------------------------------------------------------------------------------ |
+| Used Interface: | - /domains/{domain}/pseudonym                                                  |
+| What happens?   | Removing the id and idType from the record or setting the validTo date to now. |
+| Returns         | `200 Ok` with [record](/interfaces/objects/record-object/) object              |
 
 ### Invalidate the record
 
@@ -150,11 +150,11 @@ Due to quality assurance, it may be necessary to leave the pseudonym in place an
 
 --8<-- "docs/assets/snippets/admin-function.snippet"
 
-| Item          | Description                                                                                                                                                                            |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Interface:    | - [/domains/{domain}/pseudonym](/interfaces/endpoints/single/pseudonym/deleteRecord/) <br/> - [/domains/{domain}/pseudonyms](/interfaces/endpoints/batch/pseudonym/deleteRecordBatch/) |
-| What happens? | Deleting one or more records from a domain.                                                                                                                                            |
-| Returns       | 204 No Content if the request was successfull.                                                                                                                                         |
+| Item          | Description                                                        |
+| ------------- | ------------------------------------------------------------------ |
+| Interface:    | - /domains/{domain}/pseudonym <br/> - /domains/{domain}/pseudonyms |
+| What happens? | Deleting one or more records from a domain.                        |
+| Returns       | 204 No Content if the request was successfull.                     |
 
 When the records in a domain aren't needed anymore. This scenario solves the two most common use cases. First, the deletion of all records of a participant who, for example, has requested a revocation with delete option, and, second, the deletion of an incorrectly set record for a participant.
 
@@ -175,11 +175,11 @@ When the records in a domain aren't needed anymore. This scenario solves the two
 
 --8<-- "docs/assets/snippets/admin-function.snippet"
 
-| Item          | Description                                                                                    |
-| ------------- | ---------------------------------------------------------------------------------------------- |
-| Interface:    | [/domains/{domain}/pseudonyms/batch](/interfaces/endpoints/batch/pseudonym/deleteRecordBatch/) |
-| What happens? | Removes all records within the given domain.                                                   |
-| Returns       | 204 No Content if the request was successfull.                                                 |
+| Item          | Description                                    |
+| ------------- | ---------------------------------------------- |
+| Interface:    | /domains/{domain}/pseudonyms/batch             |
+| What happens? | Removes all records within the given domain.   |
+| Returns       | 204 No Content if the request was successfull. |
 
 When the records in a domain aren't needed anymore (e.g., when the domain contains temporary pseudonyms). This scenario covers the possibility of emptying a domain instead of deleting and recreating it. This happens, for example, if a lot of work has been done when creating and configuring a domain or if the domain should be emptied for another use case (e.g. daily or for a temporary data exchange).
 
@@ -200,11 +200,11 @@ When the records in a domain aren't needed anymore (e.g., when the domain contai
 
 --8<-- "docs/assets/snippets/admin-function.snippet"
 
-| Item          | Description                                                                           |
-| ------------- | ------------------------------------------------------------------------------------- |
-| Interface:    | [/domain?name=XXX&recursive=False](/interfaces/endpoints/single/domain/deleteDomain/) |
-| What happens? | The entire domain and all of the contained records **(not recursive)**.               |
-| Returns       | 204 No Content if the request was successfull.                                        |
+| Item          | Description                                                             |
+| ------------- | ----------------------------------------------------------------------- |
+| Interface:    | /domain?name=XXX&recursive=False                                        |
+| What happens? | The entire domain and all of the contained records **(not recursive)**. |
+| Returns       | 204 No Content if the request was successfull.                          |
 
 When a domain is no longer needed. This is a standard function that deletes a domain and all of the records it contains. This scenario ensures that only the specified domain and its records are deleted, but not sub-domains or other records (recursively).
 
@@ -230,7 +230,7 @@ When a domain is no longer needed. This is a standard function that deletes a do
 
 | Item          | Description                                                                                              |
 | ------------- | -------------------------------------------------------------------------------------------------------- |
-| Interface:    | [/domain?name=XXX&recursive=True](/interfaces/endpoints/single/domain/deleteDomain/)                     |
+| Interface:    | /domain?name=XXX&recursive=True                                                                          |
 | What happens? | The entire domain and all of the contained records, as well as all sub-domains and all of their records. |
 | Returns       | 204 No Content if the request was successfull.                                                           |
 

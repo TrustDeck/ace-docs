@@ -1,4 +1,4 @@
-site_name: ACE - Advanced Confidentiality Engine v0.50.0-BETA
+site_name: ACE - Advanced Confidentiality Engine v0.54.0-BETA
 docs_dir: docs
 #https://stackoverflow.com/questions/69269618/how-do-you-remove-the-previous-and-next-buttons-in-mkdocs
 extra_css:
@@ -80,36 +80,38 @@ nav:
   #    - development/authentication.md
   #    - Audit trail: development/audittrail.md
   #    - development/documentation.md
-  - Interfaces:
-      - interfaces/response-formats.md
-      - Core Objects:
-          - Domain Object: interfaces/objects/domain-object.md
-          - Record Object: interfaces/objects/record-object.md
-          - HttpStatus Objects and Code: interfaces/objects/httpstatus-object.md
-      - Experimental Endpoints:
-          - List Domain Hierarchy: interfaces/endpoints/batch/domain/listDomainHierarchy.md
-      - Domain Endpoints:
-          - Create Domain: interfaces/endpoints/single/domain/createDomain.md
-          - Create Domain Complete: interfaces/endpoints/single/domain/createDomainComplete.md
-          - Read Domain: interfaces/endpoints/single/domain/getDomain.md
-          - Update Domain: interfaces/endpoints/single/domain/updateDomain.md
-          - Update Domain Complete: interfaces/endpoints/single/domain/updateDomainComplete.md
-          - Delete Domain: interfaces/endpoints/single/domain/deleteDomain.md
-          - Read Domain Salt: interfaces/endpoints/single/domain/getSalt.md
-          - Update Domain Salt: interfaces/endpoints/single/domain/updateSalt.md
-      - Record Endpoints:
-          - Create Record: interfaces/endpoints/single/pseudonym/createRecord.md
-          - Read Record by PSN: interfaces/endpoints/single/pseudonym/getRecordByPseudonym.md
-          - Read Record by ID: interfaces/endpoints/single/pseudonym/getRecordByIdentifier.md
-          - Update Record by PSN: interfaces/endpoints/single/pseudonym/updateRecordByPseudonym.md
-          - Update Record by ID: interfaces/endpoints/single/pseudonym/updateRecordByIdentifier.md
-          - Update Record Complete by PSN: interfaces/endpoints/single/pseudonym/updateRecordCompleteByPseudonym.md
-          - Update Record Complete by ID: interfaces/endpoints/single/pseudonym/updateRecordCompleteByIdentifier.md
-          - Delete Record: interfaces/endpoints/single/pseudonym/deleteRecord.md
-          - List Records: interfaces/endpoints/batch/pseudonym/getRecordBatch.md
-          - Create Records in batch: interfaces/endpoints/batch/pseudonym/createRecordBatch.md
-          - Update Records in batch: interfaces/endpoints/batch/pseudonym/updateRecordBatch.md
-          - Delete Records in batch: interfaces/endpoints/batch/pseudonym/deleteRecordBatch.md
+  #- Interfaces:
+  #    - interfaces/response-formats.md
+  #    - Core Objects:
+  #        - Domain Object: interfaces/objects/domain-object.md
+  #        - Record Object: interfaces/objects/record-object.md
+  #        - HttpStatus Objects and Code: interfaces/objects/httpstatus-object.md
+  #    - Experimental Endpoints:
+  #        - List Domain Hierarchy: interfaces/endpoints/batch/domain/listDomainHierarchy.md
+  #    - Domain Endpoints:
+  #        - Create Domain: interfaces/endpoints/single/domain/createDomain.md
+  #        - Create Domain Complete: interfaces/endpoints/single/domain/createDomainComplete.md
+  #        - Read Domain: interfaces/endpoints/single/domain/getDomain.md
+  #        - Update Domain: interfaces/endpoints/single/domain/updateDomain.md
+  #        - Update Domain Complete: interfaces/endpoints/single/domain/updateDomainComplete.md
+  #        - Delete Domain: interfaces/endpoints/single/domain/deleteDomain.md
+  #        - Read Domain Salt: interfaces/endpoints/single/domain/getSalt.md
+  #        - Update Domain Salt: interfaces/endpoints/single/domain/updateSalt.md
+  #    - Record Endpoints:
+  #        - Create Record: interfaces/endpoints/single/pseudonym/createRecord.md
+  #        - Read Record by PSN: interfaces/endpoints/single/pseudonym/getRecordByPseudonym.md
+  #        - Read Record by ID: interfaces/endpoints/single/pseudonym/getRecordByIdentifier.md
+  #        - Update Record by PSN: interfaces/endpoints/single/pseudonym/updateRecordByPseudonym.md
+  #        - Update Record by ID: interfaces/endpoints/single/pseudonym/updateRecordByIdentifier.md
+  #        - Update Record Complete by PSN: interfaces/endpoints/single/pseudonym/updateRecordCompleteByPseudonym.md
+  #        - Update Record Complete by ID: interfaces/endpoints/single/pseudonym/updateRecordCompleteByIdentifier.md
+  #        - Delete Record: interfaces/endpoints/single/pseudonym/deleteRecord.md
+  #        - List Records: interfaces/endpoints/batch/pseudonym/getRecordBatch.md
+  #        - Create Records in batch: interfaces/endpoints/batch/pseudonym/createRecordBatch.md
+  #        - Update Records in batch: interfaces/endpoints/batch/pseudonym/updateRecordBatch.md
+  #        - Delete Records in batch: interfaces/endpoints/batch/pseudonym/deleteRecordBatch.md
+  - Interfaces: interfaces.md 
+  - Javadocs: java-docs.md
   - Project THS-MED: https://ths-med.de/
   - license.md
 markdown_extensions:
@@ -149,7 +151,11 @@ markdown_extensions:
 
 plugins:
   #- git-revision-date-localized
-  - render_swagger
+  - swagger-ui-tag:
+      docExpansion: list
+      filter: false
+      tryItOutEnabled: true
+      oauth2RedirectUrl: /assets/swagger-ui/oauth2-redirect.html
   - open-in-new-tab
   - glightbox:
       skip_classes:
